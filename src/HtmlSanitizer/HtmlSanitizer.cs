@@ -648,7 +648,7 @@ namespace Ganss.Xss
                         OnPostProcessNode(e);
                         if (e.ReplacementNodes.Any())
                         {
-                            ((IChildNode)node).Replace([.. e.ReplacementNodes]);
+                            ((IChildNode)node).Replace(e.ReplacementNodes.ToArray());
                         }
                     }
                 }
@@ -745,7 +745,13 @@ namespace Ganss.Xss
 
                 val = WhitespaceRegex.Replace(val, string.Empty);
 
-                var urls = CssUrl.Matches(val).Cast<Match>().Select(m => (Match: m, Url: SanitizeUrl(element, m.Groups[2].Value, baseUrl)));
+                var urls = CssUrl.Matches(val).Cast<Match>().Select(m =>
+                {
+                    return new {
+                        Match = m,
+                        Url = SanitizeUrl(element, m.Groups[2].Value, baseUrl)
+                    };
+                });
 
                 if (urls.Any())
                 {
@@ -882,7 +888,7 @@ namespace Ganss.Xss
             if (!e.Cancel)
             {
                 if (KeepChildNodes && tag.HasChildNodes)
-                    tag.Replace([.. tag.ChildNodes]);
+                    tag.Replace(tag.ChildNodes.ToArray());
                 else
                     tag.Remove();
             }
